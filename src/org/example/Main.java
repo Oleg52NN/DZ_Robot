@@ -6,29 +6,36 @@ import static java.lang.System.out;
 
 
 public class Main {
-    public static final Map<Integer, Integer> sizeToFreq = new TreeMap<>();
     public static final int QUANTITY_STRING = 1000;
+    public static final Map<Integer, Integer> sizeToFreq = new TreeMap<>();
+    public static int counter;
 
     public static void main(String[] args) throws InterruptedException {
+
         Thread[] myThreads = new myThread[QUANTITY_STRING];
+        Thread leader = new ThreadLeader();
+
         synchronized (sizeToFreq) {
-            for (int i = 0; i < QUANTITY_STRING; i++) {
+            for (int i = 0; i < 1000; i++) {
                 myThreads[i] = new myThread();
                 myThreads[i].start();
                 sizeToFreq.wait();
-            }
-        }
+                counter = i;
+                if (i < 1) {
+                    leader.start();
+                }
 
-        Optional<Object> max = sizeToFreq.entrySet()
-                .stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey);
-        int keyMaxValue = (int) max.get();
+            }
+
+        }
+        leader.interrupt();
+        int keyMaxValue = maxMapValue();
 
         out.println("Самое частое количество повторений " + keyMaxValue + " (встретилось " + sizeToFreq.get(keyMaxValue) + " раз)");
-        //sizeToFreq.remove(keyMaxValue);
-        out.println("Другие размеры:");
-        sizeToFreq.entrySet().forEach(key -> out.println("- " + key.getKey() + " (" + key.getValue() + " раз)"));
+        //sizeToFreq.remove(keyMaxValue); // Если не нужна эта пара в общем спсике
+        out.println("Этот и другие случаи:");
+        sizeToFreq.forEach((key1, value) -> out.println("- " + key1 + " (" + value + " раз)"));
+
 
     }
 
@@ -39,5 +46,13 @@ public class Main {
             route.append(letters.charAt(random.nextInt(letters.length())));
         }
         return route.toString();
+    }
+
+    public static int maxMapValue() {
+        Optional<Object> max = sizeToFreq.entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey);
+        return (int) max.get();
     }
 }

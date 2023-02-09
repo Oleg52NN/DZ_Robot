@@ -1,7 +1,6 @@
 package org.example;
 
-import static org.example.Main.generateRoute;
-import static org.example.Main.sizeToFreq;
+import static org.example.Main.*;
 
 public class myThread extends Thread {
     final int route = 100;
@@ -19,7 +18,6 @@ public class myThread extends Thread {
             }
         }
         synchronized (sizeToFreq) {
-
             if (sizeToFreq.containsKey(quantityR)) {
                 sizeToFreq.put(quantityR, sizeToFreq.get(quantityR) + 1);
             } else {
